@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { matchRoute, normalize } from '@/lib/router';
+import { matchRoute, normalize, savedScrollY } from '@/lib/paths';
 
 describe('matchRoute', () => {
   it('extracts and decodes params', () => {
@@ -24,5 +24,18 @@ describe('normalize', () => {
     expect(normalize('/projects/')).toBe('/projects');
     expect(normalize('/projects//')).toBe('/projects');
     expect(normalize('/')).toBe('/');
+  });
+});
+
+describe('savedScrollY', () => {
+  it('reads a saved position from history state', () => {
+    expect(savedScrollY({ scrollY: 900 })).toBe(900);
+  });
+
+  it('falls back to the top for missing or invalid state', () => {
+    expect(savedScrollY(null)).toBe(0);
+    expect(savedScrollY({})).toBe(0);
+    expect(savedScrollY({ scrollY: '900' })).toBe(0);
+    expect(savedScrollY({ scrollY: Number.NaN })).toBe(0);
   });
 });

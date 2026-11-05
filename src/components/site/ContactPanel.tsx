@@ -27,7 +27,7 @@ export function ContactPanel() {
       <div className="relative overflow-hidden rounded-[1.75rem] bg-[#16302a] px-6 py-14 text-[#eef3ef] sm:px-12 sm:py-16">
         <div className="notebook-grid pointer-events-none absolute inset-0 opacity-[0.08]" />
         <div className="relative grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-end">
-          <div className="space-y-5">
+          <div className="min-w-0 space-y-5">
             <p className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[#9fd8c8]">Contact</p>
             <h2 className="text-3xl font-semibold sm:text-4xl">Open to conversations about frontend and full-stack work.</h2>
             <p className="max-w-lg leading-[1.7] text-[#c5d3cc]">
@@ -37,15 +37,15 @@ export function ContactPanel() {
               <button
                 type="button"
                 onClick={copyEmail}
-                className="inline-flex items-center gap-3 rounded-full bg-[#eef3ef] px-5 py-3 font-medium text-[#16302a] transition-transform hover:-translate-y-0.5"
+                className="inline-flex max-w-full items-center gap-3 rounded-full bg-[#eef3ef] px-5 py-3 text-left font-medium text-[#16302a] transition-transform hover:-translate-y-0.5"
               >
-                <Mail size={17} />
-                {profile.email}
-                {copied ? <Check size={16} /> : <Copy size={16} className="opacity-60" />}
+                <Mail size={17} className="shrink-0" />
+                <span className="min-w-0 break-all">{profile.email}</span>
+                {copied ? <Check size={16} className="shrink-0" /> : <Copy size={16} className="shrink-0 opacity-60" />}
               </button>
             )}
           </div>
-          <ul className="space-y-3">
+          <ul className="min-w-0 space-y-3">
             {links.map(({ href, label, sub, icon: Icon }) => (
               <li key={label}>
                 <a
@@ -57,7 +57,7 @@ export function ContactPanel() {
                   <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/10">
                     <Icon size={18} />
                   </span>
-                  <span className="flex-1">
+                  <span className="min-w-0 flex-1">
                     <span className="block font-medium">{label}</span>
                     <span className="block text-sm text-[#a9bbb2]">{sub}</span>
                   </span>

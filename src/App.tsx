@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { RouterProvider, matchRoute, useRouter } from '@/lib/router';
+import { RouterProvider, useRouter } from '@/lib/router';
+import { matchRoute } from '@/lib/paths';
 import { usePageMeta } from '@/lib/seo';
 import { getArticle, getProject } from '@/content/queries';
 import { Header } from '@/components/site/Header';

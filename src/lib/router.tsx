@@ -9,16 +9,13 @@ import {
   type MouseEvent,
   type ReactNode,
 } from 'react';
+import { normalize, savedScrollY } from '@/lib/paths';
 
 type RouterValue = { path: string; navigate: (to: string) => void };
 
 type Location = { path: string; id: number; hash: string; scrollY: number | null };
 
 const RouterContext = createContext<RouterValue | null>(null);
-
-export function normalize(path: string) {
-  return path.length > 1 ? path.replace(/\/+$/, '') : path;
-}
 
 function focusTarget(el: HTMLElement) {
   if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
@@ -36,17 +33,30 @@ export function RouterProvider({ children, initialPath }: { children: ReactNode;
 
   useEffect(() => {
     window.history.scrollRestoration = 'manual';
+    // popstate fires after the entry has changed, so the position must be saved while scrolling.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        window.history.replaceState({ ...(window.history.state ?? {}), scrollY: window.scrollY }, '');
+      }, 120);
+    };
     const onPop = (e: PopStateEvent) => {
-      const state = e.state as { scrollY?: number } | null;
+      clearTimeout(timer);
       setLoc((prev) => ({
         path: normalize(window.location.pathname),
         id: prev.id + 1,
         hash: window.location.hash.slice(1),
-        scrollY: typeof state?.scrollY === 'number' ? state.scrollY : 0,
+        scrollY: savedScrollY(e.state),
       }));
     };
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('popstate', onPop);
+    };
   }, []);
 
   useEffect(() => {
@@ -79,23 +89,6 @@ export function useRouter() {
   const ctx = useContext(RouterContext);
   if (!ctx) throw new Error('useRouter must be used inside RouterProvider');
   return ctx;
-}
-
-export function matchRoute(pattern: string, path: string): Record<string, string> | null {
-  const p = pattern.split('/');
-  const a = path.split('/');
-  if (p.length !== a.length) return null;
-  const params: Record<string, string> = {};
-  for (let i = 0; i < p.length; i++) {
-    if (p[i].startsWith(':')) {
-      try {
-        params[p[i].slice(1)] = decodeURIComponent(a[i]);
-      } catch {
-        return null;
-      }
-    } else if (p[i] !== a[i]) return null;
-  }
-  return params;
 }
 
 type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { to: string };

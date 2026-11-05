@@ -31,6 +31,11 @@ function page(path, meta) {
     `<meta name="robots" content="${meta.found ? 'index, follow' : 'noindex'}" />`,
     url && `<link rel="canonical" href="${escape(url)}" />`,
     url && `<meta property="og:url" content="${escape(url)}" />`,
+    meta.image && `<meta property="og:image" content="${escape(meta.image)}" />`,
+    meta.image && '<meta property="og:image:width" content="1200" />',
+    meta.image && '<meta property="og:image:height" content="630" />',
+    `<meta name="twitter:card" content="${meta.image ? 'summary_large_image' : 'summary'}" />`,
+    meta.image && `<meta name="twitter:image" content="${escape(meta.image)}" />`,
   ]
     .filter(Boolean)
     .join('\n    ');
@@ -42,13 +47,19 @@ function page(path, meta) {
     .replace('<div id="root"></div>', () => `<div id="root" data-path="${escape(path)}">${render(path)}</div>`);
 }
 
+// Each page is written as both /route.html and /route/index.html so /route and /route/ serve it on most static hosts.
 const routes = listRoutes();
 for (const route of routes) {
   const meta = getPageMeta(route);
   if (!meta.found) throw new Error(`Route ${route} does not resolve to a page`);
-  const file = route === '/' ? join(dist, 'index.html') : join(dist, route, 'index.html');
-  await mkdir(dirname(file), { recursive: true });
-  await writeFile(file, page(route, meta));
+  const html = page(route, meta);
+  if (route === '/') {
+    await writeFile(join(dist, 'index.html'), html);
+    continue;
+  }
+  await mkdir(join(dist, route), { recursive: true });
+  await writeFile(join(dist, route, 'index.html'), html);
+  await writeFile(join(dist, `${route}.html`), html);
 }
 
 await writeFile(join(dist, '404.html'), page('/404', getPageMeta('/404')));
@@ -63,7 +74,7 @@ if (home) {
   );
   robots.push(`Sitemap: ${absoluteUrl('/sitemap.xml')}`);
 } else {
-  console.warn('prerender: profile.siteUrl is not set; skipping sitemap.xml and canonical links.');
+  console.warn('prerender: profile.siteUrl is not set; skipping sitemap.xml, canonical links and the social image.');
 }
 await writeFile(join(dist, 'robots.txt'), `${robots.join('\n')}\n`);
 

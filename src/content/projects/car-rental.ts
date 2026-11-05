@@ -154,7 +154,7 @@ export const carRental: Project = {
       sources: [
         { label: 'race-condition results', href: `${SRC}/requests/race-condition-results-after-anchor-lock.txt` },
         { label: 'modify results', href: `${SRC}/requests/race-condition-modify-results.txt` },
-        { label: 'test scripts', href: `${SRC}/requests` },
+        { label: 'test scripts', href: `${SRC.replace('/blob/', '/tree/')}/requests` },
       ],
       blocks: [
         {

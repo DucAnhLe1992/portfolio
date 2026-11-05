@@ -5,7 +5,7 @@ function renderInline(text: string) {
   const parts = text.split(/(`[^`]+`)/g);
   return parts.map((part, i) =>
     part.startsWith('`') && part.endsWith('`') ? (
-      <code key={i} className="rounded bg-sunken px-1.5 py-0.5 font-mono text-[0.85em]">
+      <code key={i} className="rounded bg-sunken px-1.5 py-0.5 font-mono text-[0.85em] [overflow-wrap:anywhere]">
         {part.slice(1, -1)}
       </code>
     ) : (

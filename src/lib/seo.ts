@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { matchRoute, normalize } from '@/lib/router';
+import { matchRoute, normalize } from '@/lib/paths';
 import { getArticle, getArticles, getProject, getProjects } from '@/content/queries';
 import { profile } from '@/data/profile';
 
@@ -11,7 +11,10 @@ export type PageMeta = {
   description: string;
   type: 'website' | 'article';
   found: boolean;
+  image: string | null;
 };
+
+const SOCIAL_IMAGE = '/og-image.jpg';
 
 const DEFAULT_DESCRIPTION =
   'Lê Đức Anh is a frontend-focused software engineer in Finland building thoughtful interfaces and reliable web applications with React and TypeScript.';
@@ -39,6 +42,10 @@ function fullTitle(title: string | null) {
 
 export function getPageMeta(rawPath: string): PageMeta {
   const path = normalize(rawPath);
+  return { ...resolvePage(path), image: absoluteUrl(SOCIAL_IMAGE) };
+}
+
+function resolvePage(path: string): Omit<PageMeta, 'image'> {
   const page = staticPages[path];
   if (page) return { path, title: fullTitle(page.title), description: page.description, type: 'website', found: true };
 
