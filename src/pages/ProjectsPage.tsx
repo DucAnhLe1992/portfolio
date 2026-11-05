@@ -1,10 +1,8 @@
-import { usePageMeta } from '@/lib/seo';
 import { getProjects } from '@/content/queries';
 import { ProjectCard } from '@/components/projects/ProjectCard';
 import { PageIntro } from '@/components/ui/Headings';
 
 export function ProjectsPage() {
-  usePageMeta('Projects', 'Case studies in booking correctness, in-browser bundling and event-driven services.');
   const projects = getProjects();
 
   return (

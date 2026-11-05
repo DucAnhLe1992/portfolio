@@ -22,7 +22,7 @@ export const scenarios: Scenario[] = [
       { actor: 'Database', message: 'Lock car row, check overlaps', detail: 'No pending or confirmed booking overlaps. Insert booking A.', tone: 'info', bookings: { A: 'pending_payment' } },
       { actor: 'API', message: 'Create Checkout Session', detail: 'Called after the transaction commits, with a Stripe idempotency key. Returns checkoutUrl.', tone: 'neutral', bookings: { A: 'pending_payment' } },
       { actor: 'Browser', message: 'Redirect to /success', detail: 'A user-experience signal only. Booking state does not change.', tone: 'warn', bookings: { A: 'pending_payment' } },
-      { actor: 'Stripe', message: 'checkout.session.completed', detail: 'Signature verified against raw bytes. Event id stored, booking locked, then confirmed.', tone: 'ok', bookings: { A: 'confirmed' } },
+      { actor: 'Stripe', message: 'checkout.session.completed', detail: 'Signature verified against raw bytes. Event id stored first; then, in a separate transaction, booking locked and confirmed.', tone: 'ok', bookings: { A: 'confirmed' } },
     ],
   },
   {
@@ -31,9 +31,9 @@ export const scenarios: Scenario[] = [
     question: 'What releases dates nobody paid for?',
     steps: [
       { actor: 'Client', message: 'POST /bookings', detail: 'Customer requests car #12 for 4–7 June.', tone: 'neutral', bookings: { A: 'none' } },
-      { actor: 'Database', message: 'Insert pending booking', detail: 'Dates are now held against other customers.', tone: 'info', bookings: { A: 'pending_payment' } },
+      { actor: 'Database', message: 'Insert pending booking', detail: 'Dates are held for 60 minutes, the same expiry given to the checkout session.', tone: 'info', bookings: { A: 'pending_payment' } },
       { actor: 'Browser', message: 'Tab closed on checkout', detail: 'The customer leaves without paying. Nothing is sent to the API.', tone: 'warn', bookings: { A: 'pending_payment' } },
-      { actor: 'Stripe', message: 'checkout.session.expired', detail: 'Signed webhook arrives when the session times out. Booking cancelled, dates released.', tone: 'danger', bookings: { A: 'cancelled' } },
+      { actor: 'Stripe', message: 'checkout.session.expired', detail: 'Signed webhook arrives when the session times out. A still-pending booking is cancelled and its dates released.', tone: 'danger', bookings: { A: 'cancelled' } },
     ],
   },
   {

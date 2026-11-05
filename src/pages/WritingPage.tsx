@@ -1,10 +1,8 @@
-import { usePageMeta } from '@/lib/seo';
 import { getArticles } from '@/content/queries';
 import { ArticleRow } from '@/components/writing/ArticleRow';
 import { PageIntro } from '@/components/ui/Headings';
 
 export function WritingPage() {
-  usePageMeta('Writing', 'Engineering notes on payments, concurrency and the decisions behind my projects.');
   const articles = getArticles();
 
   return (

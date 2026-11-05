@@ -1,21 +1,14 @@
-import { ArrowDown, ArrowRight, Github, Linkedin, MapPin, Wrench, BookOpen, Compass } from 'lucide-react';
+import { ArrowDown, ArrowRight, Github, Linkedin, MapPin } from 'lucide-react';
 import { Link } from '@/lib/router';
-import { usePageMeta } from '@/lib/seo';
 import { profile, skills } from '@/data/profile';
 import { getArticles, getFeaturedProjects } from '@/content/queries';
 import { ProjectCard } from '@/components/projects/ProjectCard';
+import { DecisionSnapshot } from '@/components/projects/DecisionSnapshot';
 import { ArticleRow } from '@/components/writing/ArticleRow';
 import { SectionHeading } from '@/components/ui/Headings';
 import { ContactPanel } from '@/components/site/ContactPanel';
 
-const notebook = [
-  { icon: Wrench, label: 'Build', text: 'Projects with the reasoning behind them.' },
-  { icon: BookOpen, label: 'Explain', text: 'Notes on one real problem at a time.' },
-  { icon: Compass, label: 'Explore', text: 'What I am learning next, labelled honestly.' },
-];
-
 export function HomePage() {
-  usePageMeta(null);
   const featured = getFeaturedProjects();
   const articles = getArticles();
 
@@ -62,33 +55,7 @@ export function HomePage() {
           </div>
         </div>
 
-        <aside
-          className="relative animate-rise rounded-card border border-line bg-surface p-2 shadow-[0_30px_60px_-30px_rgb(0_0_0/0.25)] [animation-delay:120ms] lg:rotate-[1.2deg] lg:transition-transform lg:duration-500 lg:hover:rotate-0"
-          aria-label="Engineer's notebook"
-        >
-          <div className="notebook-grid rounded-[1rem] bg-canvas p-6 sm:p-8">
-            <div className="mb-6 flex items-center justify-between">
-              <span className="label">Engineer’s notebook</span>
-              <span className="font-mono text-xs text-faint">{profile.pronunciation}</span>
-            </div>
-            <ul className="space-y-3">
-              {notebook.map(({ icon: Icon, label, text }) => (
-                <li key={label} className="flex items-start gap-4 rounded-xl border border-line bg-surface/90 p-4 transition-colors hover:border-accent/40">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent">
-                    <Icon size={17} />
-                  </span>
-                  <div>
-                    <p className="font-semibold">{label}</p>
-                    <p className="text-sm leading-[1.55] text-muted">{text}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-6 font-mono text-xs leading-[1.6] text-faint">
-              // {profile.tagline}
-            </p>
-          </div>
-        </aside>
+        <DecisionSnapshot />
       </section>
 
       <a href="#work" className="mx-auto mb-8 hidden w-fit items-center gap-2 text-sm text-faint transition-colors hover:text-ink sm:flex">

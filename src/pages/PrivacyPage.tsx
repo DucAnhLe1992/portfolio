@@ -1,4 +1,3 @@
-import { usePageMeta } from '@/lib/seo';
 import { PageIntro } from '@/components/ui/Headings';
 
 const items = [
@@ -10,7 +9,6 @@ const items = [
 ];
 
 export function PrivacyPage() {
-  usePageMeta('Privacy', 'How this site handles data.');
   return (
     <div className="max-w-reading">
       <PageIntro eyebrow="Privacy" title="What this site does with your data.">

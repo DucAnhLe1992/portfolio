@@ -1,6 +1,5 @@
 import { ArrowLeft, ArrowRight, ArrowUpRight, Github, Package, Scale } from 'lucide-react';
 import { Link } from '@/lib/router';
-import { usePageMeta } from '@/lib/seo';
 import type { Project } from '@/content/types';
 import { getArticle, getProjects, kindLabel } from '@/content/queries';
 import { ProjectVisual } from '@/components/projects/ProjectVisual';
@@ -14,7 +13,6 @@ const statusTone: Record<Project['status'], string> = {
 };
 
 export function ProjectPage({ project }: { project: Project }) {
-  usePageMeta(project.title, project.summary);
   const all = getProjects();
   const next = all[(all.findIndex((p) => p.slug === project.slug) + 1) % all.length];
   const related = (project.relatedWriting ?? []).map(getArticle).filter((a) => a !== null);

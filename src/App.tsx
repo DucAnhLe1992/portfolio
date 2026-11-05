@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { RouterProvider, matchRoute, useRouter } from '@/lib/router';
+import { usePageMeta } from '@/lib/seo';
 import { getArticle, getProject } from '@/content/queries';
 import { Header } from '@/components/site/Header';
 import { Footer } from '@/components/site/Footer';
@@ -39,6 +40,7 @@ function resolve(path: string): ReactNode {
 
 function Shell() {
   const { path } = useRouter();
+  usePageMeta(path);
   return (
     <div className="flex min-h-screen flex-col">
       <a
@@ -48,7 +50,7 @@ function Shell() {
         Skip to content
       </a>
       <Header />
-      <main id="main" className="mx-auto w-full max-w-wide flex-1 px-6">
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-wide flex-1 px-6 outline-none">
         {resolve(path)}
       </main>
       <Footer />
@@ -56,9 +58,9 @@ function Shell() {
   );
 }
 
-export default function App() {
+export default function App({ initialPath }: { initialPath?: string }) {
   return (
-    <RouterProvider>
+    <RouterProvider initialPath={initialPath}>
       <Shell />
     </RouterProvider>
   );

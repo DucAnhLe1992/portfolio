@@ -1,5 +1,7 @@
 import type { Article } from '@/content/types';
 
+const SRC = 'https://github.com/DucAnhLe1992/CarRental/blob/f526e0efdce465fb0286b911974af9e627124bf5/backend/src';
+
 export const overlappingReservations: Article = {
   slug: 'preventing-overlapping-reservations',
   title: 'Preventing overlapping reservations: what the database must guarantee',
@@ -39,6 +41,7 @@ export const overlappingReservations: Article = {
     {
       id: 'anchor',
       title: 'Lock an anchor row',
+      sources: [{ label: 'createBookingInTx', href: `${SRC}/services/bookingService.ts#L59-L130` }],
       blocks: [
         {
           type: 'p',
@@ -47,7 +50,12 @@ export const overlappingReservations: Article = {
         {
           type: 'code',
           lang: 'sql',
-          code: "SELECT id FROM cars WHERE id = $1 FOR UPDATE;\n\nSELECT id FROM bookings\nWHERE car_id = $1\n  AND status IN ('pending_payment', 'confirmed')\n  AND start_date < $3 AND end_date > $2\nFOR UPDATE;\n\nINSERT INTO bookings (...) VALUES (...);",
+          code: "SELECT id FROM cars WHERE id = $1 FOR UPDATE;\n\nSELECT id FROM bookings\nWHERE car_id = $1\n  AND status IN ('pending_payment', 'confirmed')\n  AND start_date <= $3  -- requested end\n  AND end_date   >= $2  -- requested start\nFOR UPDATE;\n\nINSERT INTO bookings (...) VALUES (...);",
+          caption: 'Simplified from the Drizzle query. Both comparisons are inclusive.',
+        },
+        {
+          type: 'p',
+          text: 'The comparisons are inclusive because rental dates are: a booking from 4 to 7 June includes 7 June and is priced as four days. A new booking that starts on 7 June therefore conflicts. With half-open ranges, where the end date is the morning the car comes back, you would use strict `<` and `>` instead. Pick one meaning and use it in the overlap check, the price and the interface.',
         },
         {
           type: 'p',
@@ -61,21 +69,32 @@ export const overlappingReservations: Article = {
       blocks: [
         {
           type: 'p',
-          text: 'Modifying and cancelling bookings also touch availability. If one path locks the booking and then the car, while another locks the car and then the booking, two requests can each hold the lock the other needs. Every path in the project follows the same order, so they queue instead of deadlocking.',
+          text: 'Modifying and cancelling bookings also touch availability. If one path locks the booking and then the car, while another locks the car and then the booking, two requests can each hold the lock the other needs. Re-reading the project for this article, I found it does not yet follow one order:',
         },
         {
           type: 'list',
           items: [
-            'Create: car → overlapping bookings',
-            'Modify: target booking → car → overlapping bookings',
-            'Cancel: target booking → car → update',
+            'Create: car → overlapping bookings → insert',
+            'Modify: booking (joined with its car) → car → overlapping bookings',
+            'Cancel: unlocked read of the booking → car → update the booking',
           ],
+        },
+        {
+          type: 'p',
+          text: 'PostgreSQL detects deadlocks and aborts one of the transactions, so the failure mode is an error response, not a hang. Cancel has a second, quieter issue: it checks the status it read before taking the lock. The fix for both is the same rule applied everywhere: lock the car first, then read the booking again under that lock.',
+        },
+        {
+          type: 'callout',
+          tone: 'note',
+          title: 'Lesson',
+          text: 'Writing down the lock order for every path, rather than for the path you tested, is what surfaced this. It is now the first item on the project’s list.',
         },
       ],
     },
     {
       id: 'cost',
       title: 'What it costs, and alternatives',
+      sources: [{ label: 'recorded race results', href: 'https://github.com/DucAnhLe1992/CarRental/blob/f526e0efdce465fb0286b911974af9e627124bf5/requests/race-condition-results-after-anchor-lock.txt' }],
       blocks: [
         {
           type: 'p',
@@ -89,7 +108,7 @@ export const overlappingReservations: Article = {
           type: 'callout',
           tone: 'caution',
           title: 'About the tests',
-          text: 'The repository’s race-condition scripts fire concurrent requests at a local database. They show the locking behaves as intended in that setup; they are not a proof under every isolation level or deployment.',
+          text: 'The repository’s race-condition scripts fire concurrent requests at a local database. The recorded run of ten concurrent creates for the same dates shows one success and nine conflicts. That shows the create path behaves as intended in that setup; it is not a proof under every deployment, and it does not exercise modify racing cancel.',
         },
       ],
     },

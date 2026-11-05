@@ -6,7 +6,9 @@ export type Block =
   | { type: 'callout'; tone: 'note' | 'caution'; title: string; text: string }
   | { type: 'h3'; text: string };
 
-export type Section = { id: string; title: string; blocks: Block[] };
+export type SourceLink = { label: string; href: string };
+
+export type Section = { id: string; title: string; blocks: Block[]; sources?: SourceLink[] };
 
 export type Decision = { title: string; choice: string; alternative: string; why: string };
 

@@ -1,13 +1,11 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Link } from '@/lib/router';
-import { usePageMeta } from '@/lib/seo';
 import type { Article } from '@/content/types';
 import { formatDate, getProject } from '@/content/queries';
 import { SectionView } from '@/components/content/Blocks';
 import { profile } from '@/data/profile';
 
 export function ArticlePage({ article }: { article: Article }) {
-  usePageMeta(article.title, article.summary);
   const project = article.relatedProject ? getProject(article.relatedProject) : null;
 
   return (

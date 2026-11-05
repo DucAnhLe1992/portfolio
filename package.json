@@ -1,17 +1,17 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "duc-anh-portfolio",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.4",
     "lucide-react": "^0.446.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -30,6 +30,7 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.3.0",
-    "vite": "^7.3.7"
+    "vite": "^7.3.7",
+    "vitest": "^3.2.7"
   }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from 'lucide-react';
 import { scenarios, type BookingState, type Tone } from '@/components/explainer/scenarios';
 
@@ -24,6 +24,10 @@ export function BookingExplainer() {
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
   const logRef = useRef<HTMLOListElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const uid = useId().replace(/:/g, '');
+  const panelId = `explainer-panel-${uid}`;
+  const tabId = (id: string) => `explainer-tab-${uid}-${id}`;
 
   const scenario = scenarios.find((s) => s.id === scenarioId) ?? scenarios[0];
   const current = scenario.steps[step];
@@ -56,6 +60,21 @@ export function BookingExplainer() {
     setPlaying((p) => !p);
   };
 
+  const onTabKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const index = scenarios.findIndex((s) => s.id === scenarioId);
+    const moves: Record<string, number> = {
+      ArrowRight: (index + 1) % scenarios.length,
+      ArrowLeft: (index - 1 + scenarios.length) % scenarios.length,
+      Home: 0,
+      End: scenarios.length - 1,
+    };
+    const next = moves[e.key];
+    if (next === undefined) return;
+    e.preventDefault();
+    choose(scenarios[next].id);
+    tabRefs.current[next]?.focus();
+  };
+
   return (
     <div className="overflow-hidden rounded-card border border-line bg-surface">
       <div className="space-y-2 border-b border-line p-6">
@@ -68,13 +87,19 @@ export function BookingExplainer() {
         </p>
       </div>
 
-      <div role="tablist" aria-label="Scenarios" className="flex gap-1 overflow-x-auto border-b border-line bg-sunken/40 p-2">
-        {scenarios.map((s) => (
+      <div role="tablist" aria-label="Scenarios" onKeyDown={onTabKey} className="flex gap-1 overflow-x-auto border-b border-line bg-sunken/40 p-2">
+        {scenarios.map((s, i) => (
           <button
             key={s.id}
+            ref={(el) => {
+              tabRefs.current[i] = el;
+            }}
+            id={tabId(s.id)}
             role="tab"
             type="button"
             aria-selected={s.id === scenarioId}
+            aria-controls={panelId}
+            tabIndex={s.id === scenarioId ? 0 : -1}
             onClick={() => choose(s.id)}
             className={`shrink-0 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
               s.id === scenarioId ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'
@@ -85,10 +110,11 @@ export function BookingExplainer() {
         ))}
       </div>
 
+      <div id={panelId} role="tabpanel" aria-labelledby={tabId(scenario.id)}>
       <div className="grid gap-px bg-line md:grid-cols-2">
         <div className="notebook-grid space-y-6 bg-canvas p-6">
           <p className="text-sm font-medium italic text-muted">{scenario.question}</p>
-          <div className="flex flex-col items-start gap-3" aria-label="Booking state diagram">
+          <div className="flex flex-col items-start gap-3" role="group" aria-label="Booking state diagram">
             {diagramStates.map((st, i) => {
               const on = activeStates.has(st);
               return (
@@ -123,10 +149,13 @@ export function BookingExplainer() {
 
         <div className="flex flex-col bg-surface">
           <p className="label border-b border-line px-6 py-3">Event log</p>
-          <ol ref={logRef} aria-live="polite" className="max-h-80 flex-1 space-y-4 overflow-y-auto p-6">
+          <p className="sr-only" aria-live="polite" aria-atomic="true">
+            Step {step + 1} of {last + 1}. {current.actor}: {current.message}. {current.detail}
+          </p>
+          <ol ref={logRef} className="max-h-80 flex-1 space-y-4 overflow-y-auto p-6">
             {scenario.steps.slice(0, step + 1).map((s, i) => (
               <li key={`${scenario.id}-${i}`} className={`flex gap-3 ${i === step ? 'animate-rise' : 'opacity-60'}`}>
-                <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${toneDot[s.tone]}`} />
+                <span aria-hidden="true" className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${toneDot[s.tone]}`} />
                 <div className="min-w-0 space-y-1">
                   <p className="font-mono text-xs">
                     <span className="text-faint">{s.actor}</span> <span className="text-ink">{s.message}</span>
@@ -138,9 +167,10 @@ export function BookingExplainer() {
           </ol>
         </div>
       </div>
+      </div>
 
       <div className="flex items-center justify-between gap-4 border-t border-line p-4">
-        <span className="font-mono text-xs text-faint">
+        <span className="font-mono text-xs text-faint" aria-hidden="true">
           step {step + 1} / {last + 1}
         </span>
         <div className="flex items-center gap-2">
@@ -150,10 +180,10 @@ export function BookingExplainer() {
               setPlaying(false);
               setStep(0);
             }}
-            aria-label="Restart"
+            aria-label="Restart scenario"
             className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted transition-colors hover:text-ink"
           >
-            <RotateCcw size={15} />
+            <RotateCcw size={15} aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -162,14 +192,15 @@ export function BookingExplainer() {
             aria-label="Previous step"
             className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted transition-colors hover:text-ink disabled:opacity-40"
           >
-            <ChevronLeft size={17} />
+            <ChevronLeft size={17} aria-hidden="true" />
           </button>
           <button
             type="button"
             onClick={togglePlay}
+            aria-label={playing ? 'Pause autoplay' : 'Play scenario automatically'}
             className="inline-flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-sm font-medium text-canvas transition-colors hover:bg-accent"
           >
-            {playing ? <Pause size={14} /> : <Play size={14} />}
+            {playing ? <Pause size={14} aria-hidden="true" /> : <Play size={14} aria-hidden="true" />}
             {playing ? 'Pause' : 'Play'}
           </button>
           <button
@@ -179,7 +210,7 @@ export function BookingExplainer() {
             aria-label="Next step"
             className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted transition-colors hover:text-ink disabled:opacity-40"
           >
-            <ChevronRight size={17} />
+            <ChevronRight size={17} aria-hidden="true" />
           </button>
         </div>
       </div>

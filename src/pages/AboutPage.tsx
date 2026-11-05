@@ -1,6 +1,5 @@
-import { ArrowUpRight, Briefcase, GraduationCap, MapPin, Music } from 'lucide-react';
-import { usePageMeta } from '@/lib/seo';
-import { learning, profile } from '@/data/profile';
+import { ArrowUpRight, Briefcase, Github, GraduationCap, MapPin } from 'lucide-react';
+import { experience, learning, profile } from '@/data/profile';
 import { ContactPanel } from '@/components/site/ContactPanel';
 
 const principles = [
@@ -10,8 +9,6 @@ const principles = [
 ];
 
 export function AboutPage() {
-  usePageMeta('About', `${profile.name} is a software engineer in ${profile.location}.`);
-
   return (
     <>
       <section className="grid gap-12 pb-24 pt-16 sm:pt-24 lg:grid-cols-[1fr_20rem] lg:gap-20">
@@ -47,8 +44,10 @@ export function AboutPage() {
             <li className="flex items-center gap-3 text-muted">
               <Briefcase size={16} className="text-accent" /> {profile.company}
             </li>
-            <li className="flex items-center gap-3 text-muted">
-              <Music size={16} className="text-accent" /> Music and sound, on and off the keyboard
+            <li>
+              <a href={profile.links.github} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-muted transition-colors hover:text-accent">
+                <Github size={16} className="text-accent" /> DucAnhLe1992 on GitHub
+              </a>
             </li>
           </ul>
         </aside>
@@ -69,6 +68,27 @@ export function AboutPage() {
       </section>
 
       <section className="pb-24">
+        <p className="label mb-3 text-accent">Experience</p>
+        <h2 className="mb-10 text-3xl font-semibold">Where I work</h2>
+        <ul className="space-y-4">
+          {experience.map((e) => (
+            <li key={`${e.org}-${e.role}`} className="flex flex-wrap items-start justify-between gap-4 rounded-card border border-line bg-surface p-6">
+              <div className="space-y-1">
+                <h3 className="flex items-center gap-2 text-lg font-semibold">
+                  <Briefcase size={17} className="text-accent" /> {e.role}
+                </h3>
+                <p className="text-muted">
+                  {e.org} &middot; {e.location}
+                </p>
+                {e.note && <p className="max-w-reading pt-2 leading-[1.65] text-muted">{e.note}</p>}
+              </div>
+              <span className="rounded-full bg-accent-soft px-3 py-1 font-mono text-xs text-accent">{e.period}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="pb-24">
         <p className="label mb-3 text-accent">Learning</p>
         <h2 className="mb-10 text-3xl font-semibold">Where the foundations came from</h2>
         <ol className="relative space-y-6 border-l border-line pl-8">
@@ -79,7 +99,7 @@ export function AboutPage() {
               </span>
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h3 className="flex items-center gap-2 text-lg font-semibold">
-                  <GraduationCap size={17} className="text-faint" /> {l.title}
+                  <GraduationCap size={17} className="text-muted" /> {l.title}
                 </h3>
                 <span className="label">{l.org}</span>
               </div>

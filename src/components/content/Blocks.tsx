@@ -1,4 +1,4 @@
-import { AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle, FileCode2, Info } from 'lucide-react';
 import type { Block, Section } from '@/content/types';
 
 function renderInline(text: string) {
@@ -118,6 +118,24 @@ export function SectionView({ section, index }: { section: Section; index?: numb
       {section.blocks.map((b, i) => (
         <BlockView key={i} block={b} />
       ))}
+      {section.sources && section.sources.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 border-t border-line pt-4">
+          <span className="label mr-1">Source</span>
+          {section.sources.map((s) => (
+            <a
+              key={s.href}
+              href={s.href}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 font-mono text-xs text-muted transition-colors hover:border-accent/40 hover:text-accent"
+            >
+              <FileCode2 size={13} aria-hidden="true" />
+              {s.label}
+              <span className="sr-only"> (opens GitHub at a pinned commit)</span>
+            </a>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

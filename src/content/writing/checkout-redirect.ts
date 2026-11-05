@@ -1,5 +1,7 @@
 import type { Article } from '@/content/types';
 
+const SRC = 'https://github.com/DucAnhLe1992/CarRental/blob/f526e0efdce465fb0286b911974af9e627124bf5/backend/src';
+
 export const checkoutRedirect: Article = {
   slug: 'checkout-redirect-is-not-confirmation',
   title: 'Why a checkout redirect should not confirm a booking',
@@ -36,6 +38,7 @@ export const checkoutRedirect: Article = {
     {
       id: 'authority',
       title: 'Give authority to the party that knows',
+      sources: [{ label: 'webhookController.ts', href: `${SRC}/controllers/webhookController.ts` }],
       blocks: [
         {
           type: 'p',
@@ -43,7 +46,7 @@ export const checkoutRedirect: Article = {
         },
         {
           type: 'p',
-          text: 'The success page still exists, but it only reads state. It displays whatever the server currently says the booking is (pending payment, confirmed or cancelled) and treats the redirect parameters as a hint for the interface, nothing more.',
+          text: 'The success page can still exist, but it should only display state, never change it. A return page that wants to be faster than the webhook can ask Stripe for the session server-side and run the same transition; what it must not do is trust parameters in its own URL.',
         },
         {
           type: 'table',
@@ -59,6 +62,10 @@ export const checkoutRedirect: Article = {
     {
       id: 'details',
       title: 'Details that matter',
+      sources: [
+        { label: 'app.ts', href: `${SRC}/app.ts` },
+        { label: 'webhookController.ts', href: `${SRC}/controllers/webhookController.ts` },
+      ],
       blocks: [
         {
           type: 'h3',
@@ -66,12 +73,13 @@ export const checkoutRedirect: Article = {
         },
         {
           type: 'p',
-          text: 'Signature verification hashes the exact request body. If a JSON parser runs first and re-serialises the payload, the signature will not match. The webhook route is mounted before the global JSON middleware and reads the raw body.',
+          text: 'Signature verification hashes the exact request body. If a JSON parser runs first and re-serialises the payload, the signature will not match. The webhook routes are mounted before the global JSON middleware so they receive the raw bytes.',
         },
         {
           type: 'code',
           lang: 'ts',
-          code: "app.post('/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhook);\napp.use(express.json());",
+          caption: 'Order of middleware in app.ts',
+          code: "app.use('/webhooks', webhookRoutes); // raw body for signature checks\napp.use(express.json());",
         },
         {
           type: 'h3',
@@ -79,7 +87,11 @@ export const checkoutRedirect: Article = {
         },
         {
           type: 'p',
-          text: 'Stripe retries webhooks it does not see acknowledged, and may deliver the same event more than once. Each processed event id is inserted into a table with a unique constraint. A duplicate fails that insert, the handler returns 200, and nothing else happens.',
+          text: 'Stripe retries webhooks it does not see acknowledged, and may deliver the same event more than once. Each event id is inserted into a table with a unique constraint. A duplicate conflicts on that insert, the handler returns 200, and nothing else happens.',
+        },
+        {
+          type: 'p',
+          text: 'In the project, that insert commits before the booking is updated, in a separate step. If the process stops in between, the retry is skipped as a duplicate and the booking never confirms. Recording the event and applying the transition in one transaction removes that gap.',
         },
         {
           type: 'h3',
@@ -87,7 +99,19 @@ export const checkoutRedirect: Article = {
         },
         {
           type: 'p',
-          text: 'The webhook can arrive while the customer is cancelling. The handler locks the booking row and checks the current state before changing it, so a cancelled booking is not silently revived by a late payment event.',
+          text: 'The webhook can arrive while the customer is cancelling. The handler locks the booking row and only moves it if it is still pending_payment, so a cancelled booking is not revived by a late payment event.',
+        },
+        {
+          type: 'p',
+          text: 'Not reviving it is only half the answer, though. If the customer cancelled and then paid on a checkout page they still had open, the event is ignored and the money stays captured. That case needs an automatic refund, or at least an alert.',
+        },
+        {
+          type: 'h3',
+          text: 'Know which payment methods you accept',
+        },
+        {
+          type: 'p',
+          text: 'The project treats `checkout.session.completed` as paid and does not read the session’s `payment_status`. That holds for cards, which is what I tested with. But the checkout session does not restrict payment methods, so whatever is enabled in the Stripe dashboard can appear, and with delayed methods such as bank debits a completed session can still be `unpaid`. The handler should check `payment_status` and also handle `checkout.session.async_payment_succeeded`.',
         },
       ],
     },
@@ -97,7 +121,7 @@ export const checkoutRedirect: Article = {
       blocks: [
         {
           type: 'p',
-          text: 'If a webhook is lost entirely, after all retries, the booking stays pending until the checkout session expires. A reconciliation job that asks Stripe for the session status would close that gap; it is on the list for the project.',
+          text: 'If a webhook is lost entirely, after all retries, the booking stays pending. A reconciliation job that periodically asks Stripe for the status of pending sessions would close that gap, and would also catch the dedupe gap above. It is on the list for the project.',
         },
       ],
     },

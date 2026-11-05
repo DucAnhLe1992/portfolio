@@ -13,7 +13,17 @@ export const profile = {
   },
   email: null as string | null,
   cvUrl: null as string | null,
+  siteUrl: null as string | null,
 };
+
+export const experience: { role: string; org: string; period: string; location: string; note?: string }[] = [
+  {
+    role: profile.role,
+    org: profile.company,
+    period: 'Current',
+    location: profile.location,
+  },
+];
 
 export const skills = [
   {

@@ -1,9 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import { Link } from '@/lib/router';
-import { usePageMeta } from '@/lib/seo';
 
 export function NotFoundPage() {
-  usePageMeta('Page not found');
   return (
     <div className="grid place-items-center py-24 text-center sm:py-32">
       <div className="max-w-md animate-rise space-y-6">

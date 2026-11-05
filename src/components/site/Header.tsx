@@ -10,7 +10,8 @@ const nav = [
 ];
 
 function useTheme() {
-  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const [dark, setDark] = useState(false);
+  useEffect(() => setDark(document.documentElement.classList.contains('dark')), []);
   const toggle = () => {
     const next = !dark;
     setDark(next);
@@ -97,10 +98,12 @@ export function Header() {
           <button
             type="button"
             onClick={toggle}
-            aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
+            aria-label="Dark theme"
+            aria-pressed={dark}
             className="grid h-10 w-10 place-items-center rounded-full border border-line bg-surface/70 text-muted shadow-sm transition-colors hover:text-ink"
           >
-            {dark ? <Sun size={17} /> : <Moon size={17} />}
+            <Sun size={17} aria-hidden="true" className="hidden dark:block" />
+            <Moon size={17} aria-hidden="true" className="dark:hidden" />
           </button>
           <button
             ref={menuButton}
