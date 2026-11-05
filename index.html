@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lê Đức Anh — Software Engineer</title>
+    <meta
+      name="description"
+      content="Lê Đức Anh is a frontend-focused software engineer in Finland building thoughtful interfaces and reliable web applications with React and TypeScript."
+    />
+    <meta property="og:title" content="Lê Đức Anh — Software Engineer" />
+    <meta
+      property="og:description"
+      content="Thoughtful interfaces. Reliable systems. Case studies and engineering notes."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <p style="max-width: 40rem; margin: 4rem auto; font-family: sans-serif; line-height: 1.6">
+        Lê Đức Anh — Software Engineer in Finland. React, TypeScript and full-stack web applications.
+        Source code: https://github.com/DucAnhLe1992
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --canvas: 247 246 242;
+    --surface: 255 255 255;
+    --sunken: 239 238 232;
+    --ink: 32 39 35;
+    --muted: 82 94 87;
+    --faint: 120 130 124;
+    --line: 217 222 216;
+    --accent: 23 107 91;
+    --accent-soft: 223 238 233;
+    --accent-strong: 15 82 69;
+    --ochre: 150 98 20;
+    --ochre-soft: 248 236 214;
+    --ok: 30 120 70;
+    --ok-soft: 222 241 229;
+    --warn: 160 100 10;
+    --warn-soft: 250 238 210;
+    --danger: 176 48 48;
+    --danger-soft: 250 226 224;
+    --info: 30 90 150;
+    --info-soft: 222 234 247;
+    color-scheme: light;
+  }
+
+  .dark {
+    --canvas: 17 21 19;
+    --surface: 25 30 28;
+    --sunken: 33 39 36;
+    --ink: 231 234 230;
+    --muted: 166 176 170;
+    --faint: 125 136 130;
+    --line: 48 56 52;
+    --accent: 94 196 170;
+    --accent-soft: 26 52 45;
+    --accent-strong: 140 221 199;
+    --ochre: 224 176 98;
+    --ochre-soft: 54 44 26;
+    --ok: 110 205 150;
+    --ok-soft: 26 50 36;
+    --warn: 230 180 90;
+    --warn-soft: 56 44 22;
+    --danger: 240 130 125;
+    --danger-soft: 60 30 30;
+    --info: 130 180 235;
+    --info-soft: 28 42 60;
+    color-scheme: dark;
+  }
+
+  html {
+    @apply bg-canvas text-ink antialiased;
+    font-feature-settings: 'ss01', 'cv11';
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans leading-[1.6];
+  }
+
+  h1, h2, h3, h4 {
+    @apply leading-[1.2] tracking-tight;
+  }
+
+  ::selection {
+    @apply bg-accent/20;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-canvas rounded-md;
+  }
+}
+
+@layer components {
+  .label {
+    @apply font-mono text-[0.72rem] uppercase tracking-[0.14em] text-faint;
+  }
+
+  .link {
+    @apply text-accent underline decoration-accent/30 underline-offset-[3px] transition-colors hover:decoration-accent;
+  }
+
+  .notebook-grid {
+    background-image: linear-gradient(rgb(var(--line) / 0.55) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--line) / 0.55) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
