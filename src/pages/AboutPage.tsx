@@ -1,5 +1,5 @@
-import { ArrowUpRight, Briefcase, Github, GraduationCap, MapPin } from 'lucide-react';
-import { experience, learning, profile } from '@/data/profile';
+import { ArrowUpRight, Briefcase, Github, GraduationCap, Mail, MapPin } from 'lucide-react';
+import { education, experience, learning, profile } from '@/data/profile';
 import { ContactPanel } from '@/components/site/ContactPanel';
 
 const principles = [
@@ -19,14 +19,17 @@ export function AboutPage() {
           </h1>
           <div className="max-w-reading space-y-5 text-[1.05rem] leading-[1.75] text-muted">
             <p>
-              I am a software engineer based in {profile.location}, currently at {profile.company}. My day-to-day home is React and TypeScript, but
-              the projects I enjoy most are the ones where a clean interface depends on something less visible being right: a transaction that
-              cannot double-book, a webhook that must be trusted, a bundler running inside a browser tab.
+              I am a software engineer based in {profile.location}, working as a {profile.jobTitle.toLowerCase()} at {profile.company} since
+              December 2022. Most of my day is spent on data-heavy enterprise interfaces in React and TypeScript, such as Gantt and Kanban
+              schedulers and multi-step wizards, and I add the Java, GraphQL and SQL work behind them when a feature needs it.
             </p>
             <p>
-              Much of what I know I learned by building, through structured programmes like Full Stack Open and Integrify, and through long
-              stretches of independent study. I am now exploring applied AI, and I will write about it here when there is real work to show
-              rather than before.
+              Outside work, the projects I enjoy most are the ones where a clean interface depends on something less visible being right: a
+              transaction that cannot double-book, a webhook that must be trusted, a bundler running inside a browser tab.
+            </p>
+            <p>
+              I studied software engineering at VAMK in Vaasa, and I am now doing a master’s in artificial intelligence at the University of
+              Lübeck alongside work. I will write about AI here once there is real work to show.
             </p>
             <p>
               My name is pronounced <span className="font-mono text-ink">{profile.pronunciation}</span>, and Duc Anh works perfectly well too.
@@ -42,8 +45,18 @@ export function AboutPage() {
               <MapPin size={16} className="text-accent" /> {profile.location}
             </li>
             <li className="flex items-center gap-3 text-muted">
-              <Briefcase size={16} className="text-accent" /> {profile.company}
+              <Briefcase size={16} className="text-accent" /> {profile.jobTitle}, {profile.company}
             </li>
+            <li className="flex items-center gap-3 text-muted">
+              <GraduationCap size={16} className="text-accent" /> MSc AI student, Lübeck (online)
+            </li>
+            {profile.email && (
+              <li>
+                <a href={`mailto:${profile.email}`} className="flex items-center gap-3 break-all text-muted transition-colors hover:text-accent">
+                  <Mail size={16} className="shrink-0 text-accent" /> {profile.email}
+                </a>
+              </li>
+            )}
             <li>
               <a href={profile.links.github} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-muted transition-colors hover:text-accent">
                 <Github size={16} className="text-accent" /> DucAnhLe1992 on GitHub
@@ -69,28 +82,63 @@ export function AboutPage() {
 
       <section className="pb-24">
         <p className="label mb-3 text-accent">Experience</p>
-        <h2 className="mb-10 text-3xl font-semibold">Where I work</h2>
-        <ul className="space-y-4">
+        <h2 className="mb-10 text-3xl font-semibold">Where I have worked</h2>
+        <ol className="space-y-4">
           {experience.map((e) => (
-            <li key={`${e.org}-${e.role}`} className="flex flex-wrap items-start justify-between gap-4 rounded-card border border-line bg-surface p-6">
-              <div className="space-y-1">
-                <h3 className="flex items-center gap-2 text-lg font-semibold">
-                  <Briefcase size={17} className="text-accent" /> {e.role}
-                </h3>
-                <p className="text-muted">
-                  {e.org} &middot; {e.location}
-                </p>
-                {e.note && <p className="max-w-reading pt-2 leading-[1.65] text-muted">{e.note}</p>}
+            <li key={`${e.org}-${e.role}`} className="rounded-card border border-line bg-surface p-6 transition-colors hover:border-accent/30 sm:p-8">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold">{e.role}</h3>
+                  <p className="text-muted">
+                    {e.org} &middot; {e.location}
+                  </p>
+                </div>
+                <span
+                  className={`inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-xs ${
+                    e.current ? 'bg-accent-soft text-accent' : 'bg-sunken text-muted'
+                  }`}
+                >
+                  {e.current && <span className="h-1.5 w-1.5 animate-pulseDot rounded-full bg-ok" aria-hidden="true" />}
+                  {e.period}
+                </span>
               </div>
-              <span className="rounded-full bg-accent-soft px-3 py-1 font-mono text-xs text-accent">{e.period}</span>
+              <ul className="mt-5 space-y-2.5">
+                {e.points.map((pt) => (
+                  <li key={pt} className="flex gap-3 leading-[1.65] text-muted">
+                    <span className="mt-[10px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+                    <span>{pt}</span>
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
-        </ul>
+        </ol>
       </section>
 
       <section className="pb-24">
-        <p className="label mb-3 text-accent">Learning</p>
-        <h2 className="mb-10 text-3xl font-semibold">Where the foundations came from</h2>
+        <p className="label mb-3 text-accent">Education</p>
+        <h2 className="mb-10 text-3xl font-semibold">Degrees</h2>
+        <div className="grid gap-6 md:grid-cols-2">
+          {education.map((ed) => (
+            <div key={ed.title} className="flex flex-col rounded-card border border-line bg-surface p-6">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent-soft text-accent">
+                  <GraduationCap size={19} aria-hidden="true" />
+                </span>
+                {ed.status && <span className="rounded-full bg-ochre-soft px-3 py-1 font-mono text-xs text-ochre">{ed.status}</span>}
+              </div>
+              <h3 className="text-lg font-semibold">{ed.title}</h3>
+              <p className="mt-1 text-muted">{ed.org}</p>
+              <p className="label mt-1">{ed.period}</p>
+              <p className="mt-4 border-t border-line pt-4 leading-[1.65] text-muted">{ed.note}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="pb-24">
+        <p className="label mb-3 text-accent">Also</p>
+        <h2 className="mb-10 text-3xl font-semibold">Courses with public coursework</h2>
         <ol className="relative space-y-6 border-l border-line pl-8">
           {learning.map((l) => (
             <li key={l.title} className="relative">

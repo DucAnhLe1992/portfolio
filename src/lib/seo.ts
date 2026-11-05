@@ -28,7 +28,7 @@ const staticPages: Record<string, { title: string | null; description: string }>
   },
   '/about': {
     title: 'About',
-    description: `${profile.name} is a ${profile.role.toLowerCase()} at ${profile.company} in ${profile.location}.`,
+    description: `${profile.name} is a ${profile.jobTitle.toLowerCase()} at ${profile.company} in ${profile.location}: experience, education and how I work.`,
   },
   '/privacy': { title: 'Privacy', description: 'How this site handles data.' },
 };

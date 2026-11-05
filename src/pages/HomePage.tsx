@@ -18,14 +18,15 @@ export function HomePage() {
         <div className="animate-rise space-y-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-muted shadow-sm">
             <span className="h-2 w-2 animate-pulseDot rounded-full bg-ok" />
-            {profile.role} at {profile.company}
+            {profile.jobTitle} at {profile.company}
           </div>
           <h1 className="text-[2.6rem] font-semibold leading-[1.08] sm:text-6xl">
             Building thoughtful interfaces and <span className="text-accent">reliable</span> web applications.
           </h1>
           <p className="max-w-xl text-lg leading-[1.7] text-muted">
-            I am {profile.name}, a frontend-focused engineer who cares about the systems behind the interface. I work mostly in React and
-            TypeScript, and my projects follow the data all the way down: to locks, payment webhooks and event streams.
+            I am {profile.name}, a frontend-focused engineer with about four years of B2B enterprise work in React and TypeScript, reaching
+            into Java, GraphQL and SQL when the interface needs it. My projects follow the data all the way down: to locks, payment webhooks
+            and event streams.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <Link
@@ -98,7 +99,7 @@ export function HomePage() {
 
       <section className="pb-24">
         <SectionHeading eyebrow="Explore" title="Skills, shown through work" />
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {skills.map((s) => (
             <div key={s.area} className="rounded-card border border-line bg-surface p-6 transition-colors hover:border-accent/30">
               <p className="mb-4 font-semibold">{s.area}</p>
