@@ -2,10 +2,11 @@ import type { Article, Project } from '@/content/types';
 import { carRental } from '@/content/projects/car-rental';
 import { codeNotebook } from '@/content/projects/code-notebook';
 import { ticketBooking } from '@/content/projects/ticket-booking';
+import { friendster } from '@/content/projects/friendster';
 import { checkoutRedirect } from '@/content/writing/checkout-redirect';
 import { overlappingReservations } from '@/content/writing/overlapping-reservations';
 
-const projects: Project[] = [carRental, codeNotebook, ticketBooking];
+const projects: Project[] = [carRental, codeNotebook, friendster, ticketBooking];
 const articles: Article[] = [checkoutRedirect, overlappingReservations];
 
 export function getProjects() {
@@ -41,5 +42,6 @@ export function formatDate(iso: string) {
 export const kindLabel: Record<Project['kind'], string> = {
   personal: 'Personal project',
   'course-derived': 'Course-derived',
+  'ai-assisted': 'AI-assisted build',
   professional: 'Professional',
 };

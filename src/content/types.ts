@@ -22,12 +22,12 @@ export type ProjectMeta = {
   label: string;
   summary: string;
   hardProblem: string;
-  kind: 'personal' | 'course-derived' | 'professional';
+  kind: 'personal' | 'course-derived' | 'ai-assisted' | 'professional';
   role: string;
   stack: string[];
   featured: boolean;
   status: 'maintained' | 'experimental' | 'archived';
-  visual: 'state-machine' | 'pipeline' | 'services';
+  visual: 'state-machine' | 'pipeline' | 'services' | 'token-rotation';
   evidence: { repository?: string; demo?: string; recording?: string; package?: string };
   relatedWriting?: string[];
 };

@@ -5,7 +5,7 @@ import { ContactPanel } from '@/components/site/ContactPanel';
 const principles = [
   { title: 'Put authority where the truth is', text: 'Payment state comes from the payment provider, availability from the database. The interface reflects; it does not decide.' },
   { title: 'Make the hard part visible', text: 'A case study is more useful when it explains one difficult decision than when it lists every feature.' },
-  { title: 'Be honest about provenance', text: 'Course-derived work is labelled, and limitations sit next to achievements.' },
+  { title: 'Be honest about provenance', text: 'Course-derived and AI-assisted work is labelled, and limitations sit next to achievements.' },
 ];
 
 export function AboutPage() {

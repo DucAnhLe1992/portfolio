@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-const routes = ['/', '/projects', '/projects/car-rental', '/projects/code-notebook', '/projects/ticket-booking', '/writing', '/about', '/privacy'];
+const routes = ['/', '/projects', '/projects/car-rental', '/projects/code-notebook', '/projects/ticket-booking', '/projects/friendster', '/writing', '/about', '/privacy'];
 
 async function jumpTo(page: Page, top: number) {
   await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), top);

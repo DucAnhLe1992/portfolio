@@ -10,7 +10,7 @@ export function ProjectsPage() {
       <PageIntro eyebrow="Build" title="Projects, with the reasoning left in.">
         <p>
           Each case study focuses on one hard problem, the decisions I made around it, how it was checked, and what is still missing. Course-derived
-          work is labelled as such.
+          and AI-assisted work is labelled as such.
         </p>
       </PageIntro>
       <div className="grid gap-6 md:grid-cols-2">

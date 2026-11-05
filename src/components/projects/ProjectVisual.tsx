@@ -85,6 +85,25 @@ function Services() {
   );
 }
 
+function TokenRotation({ marker }: { marker: string }) {
+  const tokens = ['refresh 1', 'refresh 2', 'refresh 3'];
+  return (
+    <>
+      <Node x={16} y={50} w={72} label="sign in" tone="accent" />
+      {tokens.map((t, i) => (
+        <g key={t}>
+          <Edge marker={marker} d={`M${i === 0 ? 88 : 98 + i * 96} 67 H${108 + i * 96}`} />
+          <Node x={112 + i * 96} y={50} w={82} label={t} tone={i === tokens.length - 1 ? 'ok' : 'base'} />
+        </g>
+      ))}
+      <text x={248} y={40} textAnchor="middle" className="fill-faint font-mono text-[9px]">each token works once</text>
+      <Edge marker={marker} d="M153 84 V144 H226" dashed />
+      <text x={160} y={120} className="fill-faint font-mono text-[9px]">replayed later</text>
+      <Node x={230} y={127} w={150} label="revoke every session" tone="danger" />
+    </>
+  );
+}
+
 export function ProjectVisual({ kind, className = '' }: { kind: ProjectMeta['visual']; className?: string }) {
   const marker = `arrow-${useId().replace(/:/g, '')}`;
   return (
@@ -98,6 +117,7 @@ export function ProjectVisual({ kind, className = '' }: { kind: ProjectMeta['vis
         {kind === 'state-machine' && <StateMachine marker={marker} />}
         {kind === 'pipeline' && <Pipeline marker={marker} />}
         {kind === 'services' && <Services />}
+        {kind === 'token-rotation' && <TokenRotation marker={marker} />}
       </svg>
     </div>
   );
