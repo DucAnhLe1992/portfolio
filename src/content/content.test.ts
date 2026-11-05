@@ -46,4 +46,19 @@ describe('content integrity', () => {
     const code = article?.sections.flatMap((s) => s.blocks).find((b) => b.type === 'code');
     expect(code && code.type === 'code' && code.code).toMatch(/start_date <= \$3[\s\S]*end_date\s+>= \$2/);
   });
+
+  it('gives every project a substantive outcome', () => {
+    for (const p of projects) {
+      for (const [field, text] of Object.entries(p.outcome)) expect(text.length, `${p.slug}.${field}`).toBeGreaterThan(20);
+    }
+  });
+
+  it('describes screenshots with local files, alt text, captions and dimensions', () => {
+    for (const f of projects.flatMap((p) => p.screenshots ?? [])) {
+      expect(f.src).toMatch(/^\/screenshots\/[\w.-]+\.(png|jpe?g|webp)$/);
+      expect(f.alt.length, f.src).toBeGreaterThan(10);
+      expect(f.caption.length, f.src).toBeGreaterThan(0);
+      expect(f.width > 0 && f.height > 0, f.src).toBe(true);
+    }
+  });
 });

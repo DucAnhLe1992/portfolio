@@ -15,9 +15,9 @@ export function HomePage() {
   return (
     <>
       <section className="relative grid gap-12 pb-24 pt-16 sm:pt-24 lg:grid-cols-[1.25fr_1fr] lg:items-center lg:gap-16">
-        <div className="animate-rise space-y-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-muted shadow-sm">
-            <span className="h-2 w-2 animate-pulseDot rounded-full bg-ok" />
+        <div className="min-w-0 animate-rise space-y-8">
+          <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-muted shadow-sm">
+            <span className="h-2 w-2 shrink-0 animate-pulseDot rounded-full bg-ok" />
             {profile.jobTitle} at {profile.company}
           </div>
           <h1 className="text-[2.6rem] font-semibold leading-[1.08] sm:text-6xl">

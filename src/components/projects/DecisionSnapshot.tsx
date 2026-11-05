@@ -19,10 +19,10 @@ export function DecisionSnapshot() {
   return (
     <aside
       aria-labelledby="snapshot-title"
-      className="relative animate-rise rounded-card border border-line bg-surface p-2 shadow-[0_30px_60px_-30px_rgb(0_0_0/0.25)] [animation-delay:120ms]"
+      className="relative min-w-0 animate-rise rounded-card border border-line bg-surface p-2 shadow-[0_30px_60px_-30px_rgb(0_0_0/0.25)] [animation-delay:120ms]"
     >
-      <div className="notebook-grid space-y-6 rounded-[1rem] bg-canvas p-6 sm:p-7">
-        <div className="flex items-center justify-between gap-4">
+      <div className="notebook-grid space-y-6 rounded-[1rem] bg-canvas p-5 sm:p-7">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <span className="label">Decision · {project.title}</span>
           <span className="rounded-full bg-accent-soft px-2.5 py-1 font-mono text-[0.68rem] text-accent">from the code</span>
         </div>
@@ -51,7 +51,7 @@ export function DecisionSnapshot() {
                 <span className="sr-only">{s.trusted ? 'Can change booking state' : 'Cannot change booking state'}</span>
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-mono text-xs text-ink">{s.from}</p>
+                <p className="font-mono text-xs text-ink [overflow-wrap:anywhere]">{s.from}</p>
                 <p className="text-xs text-muted">
                   {s.by} · {s.may}
                 </p>

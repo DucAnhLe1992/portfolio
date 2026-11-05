@@ -34,15 +34,26 @@ export function ContactPanel() {
               The quickest way to reach me is LinkedIn. If you are reviewing a project, every case study links to its source.
             </p>
             {profile.email && (
-              <button
-                type="button"
-                onClick={copyEmail}
-                className="inline-flex max-w-full items-center gap-3 rounded-full bg-[#eef3ef] px-5 py-3 text-left font-medium text-[#16302a] transition-transform hover:-translate-y-0.5"
-              >
-                <Mail size={17} className="shrink-0" />
-                <span className="min-w-0 break-all">{profile.email}</span>
-                {copied ? <Check size={16} className="shrink-0" /> : <Copy size={16} className="shrink-0 opacity-60" />}
-              </button>
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={copyEmail}
+                  aria-label={`Copy email address ${profile.email}`}
+                  title="Copy email address"
+                  className="inline-flex max-w-full items-center gap-3 rounded-full bg-[#eef3ef] px-5 py-3 text-left font-medium text-[#16302a] transition-transform hover:-translate-y-0.5"
+                >
+                  <Mail size={17} className="shrink-0" aria-hidden="true" />
+                  <span className="min-w-0 break-all">{profile.email}</span>
+                  {copied ? (
+                    <Check size={16} className="shrink-0" aria-hidden="true" />
+                  ) : (
+                    <Copy size={16} className="shrink-0 opacity-60" aria-hidden="true" />
+                  )}
+                </button>
+                <p role="status" aria-live="polite" className="min-h-5 pl-5 text-sm text-[#9fd8c8]">
+                  {copied ? 'Email copied to clipboard' : ''}
+                </p>
+              </div>
             )}
           </div>
           <ul className="min-w-0 space-y-3">
@@ -55,7 +66,7 @@ export function ContactPanel() {
                   className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition-colors hover:border-white/25 hover:bg-white/[0.08]"
                 >
                   <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/10">
-                    <Icon size={18} />
+                    <Icon size={18} aria-hidden="true" />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-medium">{label}</span>

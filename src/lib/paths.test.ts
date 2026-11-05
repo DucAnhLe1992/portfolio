@@ -1,5 +1,32 @@
 import { describe, expect, it } from 'vitest';
-import { matchRoute, normalize, savedScrollY } from '@/lib/paths';
+import { canonicalPath, entryKey, matchRoute, normalize, savedScrollY } from '@/lib/paths';
+
+describe('canonicalPath', () => {
+  it('maps prerendered file aliases to the clean route', () => {
+    expect(canonicalPath('/about.html')).toBe('/about');
+    expect(canonicalPath('/projects/car-rental.html')).toBe('/projects/car-rental');
+    expect(canonicalPath('/projects/car-rental/index.html')).toBe('/projects/car-rental');
+    expect(canonicalPath('/index.html')).toBe('/');
+  });
+
+  it('leaves clean and trailing-slash paths alone apart from the slash', () => {
+    expect(canonicalPath('/')).toBe('/');
+    expect(canonicalPath('/projects/')).toBe('/projects');
+    expect(canonicalPath('/projects/car-rental')).toBe('/projects/car-rental');
+  });
+});
+
+describe('entryKey', () => {
+  it('reads a non-empty string key', () => {
+    expect(entryKey({ key: 'abc' })).toBe('abc');
+  });
+
+  it('returns null for missing or invalid keys', () => {
+    expect(entryKey(null)).toBeNull();
+    expect(entryKey({ key: '' })).toBeNull();
+    expect(entryKey({ key: 4 })).toBeNull();
+  });
+});
 
 describe('matchRoute', () => {
   it('extracts and decodes params', () => {

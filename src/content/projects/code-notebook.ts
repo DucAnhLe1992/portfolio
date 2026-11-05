@@ -137,6 +137,16 @@ export const codeNotebook: Project = {
       why: 'A file on disk can be versioned, shared and opened again with the same command, and nothing leaves the machine.',
     },
   ],
+  outcome: {
+    works:
+      'One command starts a local server and opens a notebook with code and Markdown cells. Each code cell is bundled in the browser and previewed beside the editor, and the notebook is saved to a file on your machine.',
+    verified:
+      'The flow on this page is described from the source at a pinned commit, and the CLI is published to npm. No automated test results are cited here.',
+    limits:
+      'There is no hosted demo, TypeScript syntax inside cells is not supported, and new packages are fetched from unpkg, so the notebook needs network access.',
+    lesson:
+      'Running user code in a tab is mostly about boundaries: compile in the browser, execute in a separate preview frame, and be explicit about what that frame does not isolate, such as execution time.',
+  },
   limitations: [
     'It runs locally; there is no hosted demo. A recording will be added here.',
     'Cells are transpiled as JSX only; TypeScript syntax inside a cell is not supported.',

@@ -208,6 +208,16 @@ export const carRental: Project = {
       why: 'Network calls inside a transaction stretch lock windows and block other customers. Idempotency keys make the out-of-transaction call safe to retry.',
     },
   ],
+  outcome: {
+    works:
+      'Customers can browse cars, book a date range and pay with Stripe Checkout in test mode; admins manage the fleet and see every booking. A booking becomes confirmed only from a signed Stripe webhook.',
+    verified:
+      'Repository scripts fire concurrent requests at a locally running API: 10 simultaneous bookings for the same car and dates produced 1 success and 9 overlap rejections. Repeated requests with one idempotency key were also checked locally.',
+    limits:
+      'Modify and cancel take locks in a different order, webhook dedupe and the state change are not atomic, and a payment completed after cancellation is not refunded automatically. No live deployment is linked.',
+    lesson:
+      'The success redirect is a hint for the interface, not proof of payment. State changes belong to the signed event, and every rule needs a test that interleaves the operations it protects against.',
+  },
   limitations: [
     'Lock order differs between modify and cancel; the planned fix is car-first everywhere, re-reading booking state after the lock, with a test that interleaves the two.',
     'Webhook dedupe and the state transition are not atomic, the handler does not check `payment_status`, and a payment completed after cancellation is not refunded automatically.',

@@ -64,7 +64,19 @@ for (const route of routes) {
 
 await writeFile(join(dist, '404.html'), page('/404', getPageMeta('/404')));
 
+const aliases = routes.flatMap((r) => (r === '/' ? [['/index.html', '/']] : [[`${r}.html`, r], [`${r}/index.html`, r]]));
+const redirects = await readFile(join(dist, '_redirects'), 'utf8');
+await writeFile(join(dist, '_redirects'), `${aliases.map(([from, to]) => `${from}  ${to}  301!`).join('\n')}\n${redirects}`);
+
 const home = absoluteUrl('/');
+if (home) {
+  const origin = new URL(home);
+  if (origin.protocol !== 'https:' || origin.pathname !== '/' || origin.search || origin.hash) {
+    throw new Error(`prerender: profile.siteUrl must be a bare https origin, got ${home}`);
+  }
+} else if (process.env.REQUIRE_SITE_URL) {
+  throw new Error('prerender: REQUIRE_SITE_URL is set but profile.siteUrl is null; set the production origin before deploying.');
+}
 const robots = ['User-agent: *', 'Allow: /'];
 if (home) {
   const urls = routes.map((r) => `  <url><loc>${escape(absoluteUrl(r))}</loc></url>`).join('\n');

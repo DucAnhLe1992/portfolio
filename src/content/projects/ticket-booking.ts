@@ -78,6 +78,16 @@ export const ticketBooking: Project = {
       why: 'Event definitions stay identical across services, and changes are explicit version bumps.',
     },
   ],
+  outcome: {
+    works:
+      'Users can sign up, list tickets, place orders and pay through Stripe; unpaid orders are released automatically. Each service owns its data and learns about others only through events.',
+    verified:
+      'The main services have GitHub Actions test workflows, and each service has a workflow that builds its image and redeploys it to a Kubernetes cluster. The hosted demo is currently offline.',
+    limits:
+      'Course-derived foundation, not load-tested, and built on NATS Streaming, which has since been deprecated in favour of JetStream.',
+    lesson:
+      'With a database per service, agreement comes from versioned events: a service applies an update only when it is the next version it expects.',
+  },
   limitations: [
     'Course-derived foundation; scalability has not been load-tested.',
     'NATS Streaming has since been deprecated in favour of NATS JetStream.',

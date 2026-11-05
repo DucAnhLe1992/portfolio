@@ -9,7 +9,7 @@ import {
   type MouseEvent,
   type ReactNode,
 } from 'react';
-import { normalize, savedScrollY } from '@/lib/paths';
+import { canonicalPath, entryKey, savedScrollY } from '@/lib/paths';
 
 type RouterValue = { path: string; navigate: (to: string) => void };
 
@@ -22,32 +22,56 @@ function focusTarget(el: HTMLElement) {
   el.focus({ preventScroll: true });
 }
 
+function newKey() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+function currentKey() {
+  const existing = entryKey(window.history.state);
+  if (existing) return existing;
+  const key = newKey();
+  window.history.replaceState({ ...(window.history.state ?? {}), key }, '');
+  return key;
+}
+
 export function RouterProvider({ children, initialPath }: { children: ReactNode; initialPath?: string }) {
   const [loc, setLoc] = useState<Location>(() => ({
-    path: normalize(initialPath ?? window.location.pathname),
+    path: canonicalPath(initialPath ?? window.location.pathname),
     id: 0,
     hash: '',
     scrollY: null,
   }));
   const first = useRef(true);
+  const keyRef = useRef<string | null>(null);
+  const positions = useRef(new Map<string, number>());
 
   useEffect(() => {
     window.history.scrollRestoration = 'manual';
-    // popstate fires after the entry has changed, so the position must be saved while scrolling.
+    keyRef.current = currentKey();
+    // Positions are keyed by history entry so a pending save can never land on the entry that popstate just activated.
     let timer: ReturnType<typeof setTimeout> | undefined;
     const onScroll = () => {
+      const key = keyRef.current;
+      if (!key) return;
+      positions.current.set(key, window.scrollY);
       clearTimeout(timer);
       timer = setTimeout(() => {
-        window.history.replaceState({ ...(window.history.state ?? {}), scrollY: window.scrollY }, '');
+        if (entryKey(window.history.state) !== key) return;
+        window.history.replaceState({ ...window.history.state, scrollY: window.scrollY }, '');
       }, 120);
     };
     const onPop = (e: PopStateEvent) => {
       clearTimeout(timer);
+      const known = entryKey(e.state);
+      const key = known ?? currentKey();
+      keyRef.current = key;
+      // An entry without a key is a fresh in-page #anchor jump, which should scroll to its target.
+      const scrollY = known ? (positions.current.get(key) ?? savedScrollY(e.state)) : null;
       setLoc((prev) => ({
-        path: normalize(window.location.pathname),
+        path: canonicalPath(window.location.pathname),
         id: prev.id + 1,
         hash: window.location.hash.slice(1),
-        scrollY: savedScrollY(e.state),
+        scrollY,
       }));
     };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -66,9 +90,10 @@ export function RouterProvider({ children, initialPath }: { children: ReactNode;
     }
     requestAnimationFrame(() => {
       const target = loc.hash ? document.getElementById(loc.hash) : null;
-      if (loc.scrollY !== null) window.scrollTo({ top: loc.scrollY });
-      else if (target) target.scrollIntoView();
-      else window.scrollTo({ top: 0 });
+      // Page changes jump; smooth scrolling is reserved for in-page anchor clicks.
+      if (loc.scrollY !== null) window.scrollTo({ top: loc.scrollY, behavior: 'instant' });
+      else if (target) target.scrollIntoView({ behavior: 'instant' });
+      else window.scrollTo({ top: 0, behavior: 'instant' });
 
       const focusEl = target ?? document.querySelector<HTMLElement>('main h1') ?? document.getElementById('main');
       if (focusEl) focusTarget(focusEl);
@@ -78,8 +103,10 @@ export function RouterProvider({ children, initialPath }: { children: ReactNode;
   const navigate = useCallback((to: string) => {
     const [pathname, hash = ''] = to.split('#');
     window.history.replaceState({ ...(window.history.state ?? {}), scrollY: window.scrollY }, '');
-    window.history.pushState({ scrollY: 0 }, '', to);
-    setLoc((prev) => ({ path: normalize(pathname || '/'), id: prev.id + 1, hash, scrollY: null }));
+    const key = newKey();
+    window.history.pushState({ key, scrollY: 0 }, '', to);
+    keyRef.current = key;
+    setLoc((prev) => ({ path: canonicalPath(pathname || '/'), id: prev.id + 1, hash, scrollY: null }));
   }, []);
 
   return <RouterContext.Provider value={{ path: loc.path, navigate }}>{children}</RouterContext.Provider>;

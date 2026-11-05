@@ -12,6 +12,10 @@ export type Section = { id: string; title: string; blocks: Block[]; sources?: So
 
 export type Decision = { title: string; choice: string; alternative: string; why: string };
 
+export type Outcome = { works: string; verified: string; limits: string; lesson: string };
+
+export type Figure = { src: string; alt: string; width: number; height: number; caption: string };
+
 export type ProjectMeta = {
   slug: string;
   title: string;
@@ -30,6 +34,8 @@ export type ProjectMeta = {
 
 export type Project = ProjectMeta & {
   overview: string;
+  outcome: Outcome;
+  screenshots?: Figure[];
   sections: Section[];
   decisions: Decision[];
   limitations: string[];

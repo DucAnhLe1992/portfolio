@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, ArrowUpRight, Github, Package, Scale } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, CircleCheck, FlaskConical, Github, Lightbulb, Package, Scale, TriangleAlert } from 'lucide-react';
 import { Link } from '@/lib/router';
 import type { Project } from '@/content/types';
 import { getArticle, getProjects, kindLabel } from '@/content/queries';
@@ -17,7 +17,17 @@ export function ProjectPage({ project }: { project: Project }) {
   const next = all[(all.findIndex((p) => p.slug === project.slug) + 1) % all.length];
   const related = (project.relatedWriting ?? []).map(getArticle).filter((a) => a !== null);
 
+  const screenshots = project.screenshots ?? [];
+  const outcomeCards = [
+    { label: 'What works', text: project.outcome.works, icon: CircleCheck, tone: 'text-ok' },
+    { label: 'How it was checked', text: project.outcome.verified, icon: FlaskConical, tone: 'text-info' },
+    { label: 'What is limited', text: project.outcome.limits, icon: TriangleAlert, tone: 'text-warn' },
+    { label: 'Main lesson', text: project.outcome.lesson, icon: Lightbulb, tone: 'text-accent' },
+  ];
+
   const toc = [
+    { id: 'outcome', title: 'Outcome' },
+    ...(screenshots.length > 0 ? [{ id: 'screens', title: 'Screens' }] : []),
     { id: 'overview', title: 'Overview' },
     ...project.sections.map((s) => ({ id: s.id, title: s.title })),
     ...(project.hasExplainer ? [{ id: 'explainer', title: 'Booking explainer' }] : []),
@@ -97,7 +107,52 @@ export function ProjectPage({ project }: { project: Project }) {
           </dl>
         </div>
         <ProjectVisual kind={project.visual} className="mt-12 aspect-[2/1] rounded-card border border-line sm:aspect-[5/2]" />
-        <p className="mt-3 text-sm text-faint">Simplified diagram. Screenshots of the running application will be added.</p>
+        <p className="mt-3 text-sm text-faint">
+          {screenshots.length > 0 ? 'Simplified diagram of the system.' : 'Simplified diagram. Screenshots of the running application will be added.'}
+        </p>
+
+        <section id="outcome" aria-labelledby="outcome-title" className="mt-16 scroll-mt-24">
+          <h2 id="outcome-title" className="label mb-5 text-accent">
+            Outcome
+          </h2>
+          <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {outcomeCards.map(({ label, text, icon: Icon, tone }) => (
+              <div
+                key={label}
+                className="rounded-card border border-line bg-surface p-6 transition-colors hover:border-accent/30"
+              >
+                <dt className="mb-3 flex items-center gap-2.5 text-sm font-semibold">
+                  <Icon size={17} aria-hidden="true" className={tone} /> {label}
+                </dt>
+                <dd className="text-sm leading-[1.65] text-muted">{text}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        {screenshots.length > 0 && (
+          <section id="screens" aria-labelledby="screens-title" className="mt-16 scroll-mt-24">
+            <h2 id="screens-title" className="label mb-5 text-accent">
+              Screens
+            </h2>
+            <div className="grid gap-8 md:grid-cols-2">
+              {screenshots.map((f) => (
+                <figure key={f.src} className="space-y-3">
+                  <img
+                    src={f.src}
+                    alt={f.alt}
+                    width={f.width}
+                    height={f.height}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-auto w-full rounded-card border border-line bg-sunken shadow-sm"
+                  />
+                  <figcaption className="text-sm leading-[1.6] text-faint">{f.caption}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       <div className="mt-20 grid gap-16 lg:grid-cols-[13rem_1fr]">
