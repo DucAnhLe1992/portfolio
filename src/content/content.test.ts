@@ -65,8 +65,7 @@ describe('content integrity', () => {
     }
   });
 
-  it('links the CV to a PDF that ships with the site', () => {
-    if (!profile.cvUrl) return;
+  it.skipIf(!profile.cvUrl)('links the CV to a PDF that ships with the site', () => {
     expect(profile.cvUrl).toMatch(/^\/[\w.-]+\.pdf$/);
     expect(existsSync(`public${profile.cvUrl}`), `${profile.cvUrl} is missing from public/`).toBe(true);
   });
