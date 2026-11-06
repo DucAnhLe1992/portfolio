@@ -27,7 +27,7 @@ export function Footer() {
         </nav>
       </div>
       <div className="mx-auto max-w-wide px-6 pb-10">
-        <p className="label">© {new Date().getFullYear()} · Designed and built by {profile.latinName}</p>
+        <p className="label">© {new Date().getFullYear()} · Designed and built by {profile.name}</p>
       </div>
     </footer>
   );

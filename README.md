@@ -1,4 +1,4 @@
-# Lê Đức Anh — portfolio
+# Duc-Anh Le — portfolio
 
 Personal site with case studies and engineering notes. Built with Vite, React 18, TypeScript and Tailwind CSS. Content lives in typed TypeScript modules; there is no CMS or backend.
 

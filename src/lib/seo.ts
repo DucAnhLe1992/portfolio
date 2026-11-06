@@ -17,7 +17,7 @@ export type PageMeta = {
 const SOCIAL_IMAGE = '/og-image.jpg';
 
 const DEFAULT_DESCRIPTION =
-  'Lê Đức Anh is a frontend-focused software engineer in Finland building thoughtful interfaces and reliable web applications with React and TypeScript.';
+  'Duc-Anh Le is a frontend-focused software engineer in Finland building thoughtful interfaces and reliable web applications with React and TypeScript.';
 
 const staticPages: Record<string, { title: string | null; description: string }> = {
   '/': { title: null, description: DEFAULT_DESCRIPTION },

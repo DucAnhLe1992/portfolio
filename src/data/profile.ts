@@ -1,6 +1,5 @@
 export const profile = {
-  name: 'Lê Đức Anh',
-  latinName: 'Duc Anh Le',
+  name: 'Duc-Anh Le',
   pronunciation: '/duːk æŋ lɛ/',
   role: 'Software Engineer',
   jobTitle: 'Software Developer',

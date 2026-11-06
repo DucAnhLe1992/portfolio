@@ -32,7 +32,7 @@ export function AboutPage() {
               Lübeck alongside work. I will write about AI here once there is real work to show.
             </p>
             <p>
-              My name is pronounced <span className="font-mono text-ink">{profile.pronunciation}</span>, and Duc Anh works perfectly well too.
+              My name is pronounced <span className="font-mono text-ink">{profile.pronunciation}</span>.
             </p>
           </div>
         </div>
