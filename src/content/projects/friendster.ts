@@ -52,8 +52,9 @@ export const friendster: Project = {
         {
           type: 'list',
           items: [
-            'If an already-rotated token comes back after a 30-second grace window, the server treats it as stolen and ends every session for that account.',
-            'The grace window exists because several open tabs can refresh at the same moment with the same token.',
+            'If an already-rotated token comes back after a 30-second grace window, the server treats it as stolen and deletes every refresh session for that account, so no device can refresh again.',
+            'Access tokens already issued are not checked against those records, so they keep working until they expire (15 minutes by default).',
+            'Inside the grace window, a duplicate refresh is still refused; the window only stops it from revoking the account. It exists because several open tabs can refresh at the same moment with the same token, and the web client then picks up the winning tab’s new token from shared storage.',
             'Logout deletes only its own family, so other devices stay signed in.',
             'If a logout races a refresh, the refresh checks that its record still exists after issuing the successor, and withdraws the new session if not.',
           ],
@@ -62,7 +63,7 @@ export const friendster: Project = {
           type: 'callout',
           tone: 'note',
           title: 'Trade-off',
-          text: 'Ending every session on replay also signs out the real owner. That is deliberate: once a token has been reused, the server cannot tell which caller is the legitimate one.',
+          text: 'Revoking on replay also signs out the real owner once their access token expires. That is deliberate: once a token has been reused, the server cannot tell which caller is the legitimate one. Ending access tokens immediately would need a check on every request, which this project does not do.',
         },
       ],
       sources: [
@@ -162,7 +163,8 @@ export const friendster: Project = {
   limitations: [
     'Code written with an AI coding assistant; the commit history reflects that.',
     'No hosted demo; it runs locally with Docker Compose.',
-    'The web app has no automated tests, and nothing has been load-tested.',
+    'The web app has no automated tests, and nothing has been load-tested. Refreshing from several tabs at once has not been tested in a browser.',
+    'Revocation stops refreshes only; access tokens already issued stay valid for up to 15 minutes.',
     'The README lists more than this page covers; treat this page as the verified subset.',
   ],
 };

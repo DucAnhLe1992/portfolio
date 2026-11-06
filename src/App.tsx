@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { RouterProvider, useRouter } from '@/lib/router';
 import { matchRoute } from '@/lib/paths';
 import { usePageMeta } from '@/lib/seo';
@@ -42,6 +42,9 @@ function resolve(path: string): ReactNode {
 function Shell() {
   const { path } = useRouter();
   usePageMeta(path);
+  useEffect(() => {
+    document.documentElement.dataset.hydrated = 'true';
+  }, []);
   return (
     <div className="flex min-h-screen flex-col">
       <a

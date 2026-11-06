@@ -1,21 +1,56 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 
-const routes = ['/', '/projects', '/projects/car-rental', '/projects/code-notebook', '/projects/ticket-booking', '/projects/friendster', '/writing', '/about', '/privacy'];
+function builtRoutes(dir = 'dist'): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) return builtRoutes(full);
+    if (entry.name !== 'index.html') return [];
+    const match = readFileSync(full, 'utf8').match(/<div id="root" data-path="([^"]+)"/);
+    return match ? [match[1]] : [];
+  });
+}
+
+const routes = builtRoutes().sort();
+
+function collectErrors(page: Page) {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error') errors.push(m.text());
+  });
+  return errors;
+}
+
+async function settle(page: Page) {
+  await expect(page.locator('html')).toHaveAttribute('data-hydrated', 'true');
+  await page.evaluate(() => document.fonts.ready);
+}
 
 async function jumpTo(page: Page, top: number) {
   await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), top);
   return page.evaluate(() => window.scrollY);
 }
 
+test('every prerendered page is covered', () => {
+  expect(routes.length).toBeGreaterThanOrEqual(11);
+  expect(routes.filter((r) => r.startsWith('/writing/'))).toHaveLength(2);
+  expect(routes).toEqual(expect.arrayContaining(['/', '/projects/friendster']));
+});
+
 test.describe('narrow viewport', () => {
   test.use({ viewport: { width: 320, height: 640 } });
 
   for (const route of routes) {
     test(`${route} fits 320px without horizontal overflow`, async ({ page }) => {
+      const errors = collectErrors(page);
       await page.goto(route);
+      await settle(page);
       await expect(page.locator('main h1')).toBeVisible();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow).toBeLessThanOrEqual(0);
+      expect(errors).toEqual([]);
     });
   }
 });
@@ -35,16 +70,20 @@ test.describe('without JavaScript', () => {
 
 for (const alias of ['/about.html', '/projects/car-rental.html', '/projects/car-rental/index.html']) {
   test(`${alias} keeps its content after hydration and shows the clean URL`, async ({ page }) => {
+    const errors = collectErrors(page);
     await page.goto(alias);
+    await settle(page);
     const clean = alias.replace(/\/index\.html$/, '').replace(/\.html$/, '');
-    await expect(page).toHaveURL(new RegExp(`${clean.replace(/\//g, '\\/')}$`));
-    await expect(page.locator('main h1')).not.toHaveText(/not found/i);
+    await expect(page).toHaveURL(new RegExp(clean.replace(/\//g, '\\/') + '$'));
+    await expect(page.locator('main h1')).toHaveText(alias.includes('car-rental') ? 'Car Rental' : /^I am /);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
+    expect(errors).toEqual([]);
   });
 }
 
 test('client navigation updates metadata and moves focus to the heading', async ({ page }) => {
   await page.goto('/projects');
+  await settle(page);
   await page.locator('main a[href="/projects/car-rental"]').first().click();
   await expect(page).toHaveURL(/\/projects\/car-rental$/);
   await expect(page).toHaveTitle(/Car Rental/);
@@ -55,6 +94,7 @@ test('client navigation updates metadata and moves focus to the heading', async 
 test('back and forward restore scroll position, even right after scrolling', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/projects/car-rental');
+  await settle(page);
   const before = await jumpTo(page, 1500);
   expect(before).toBeGreaterThan(1000);
 
@@ -75,6 +115,7 @@ test('back and forward restore scroll position, even right after scrolling', asy
 test('table of contents links jump to their section', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/projects/car-rental');
+  await settle(page);
   await page.getByRole('navigation', { name: 'On this page' }).getByRole('link').last().click();
   await expect(page).toHaveURL(/#limitations$/);
   await expect(page.locator('#limitations')).toBeInViewport();
@@ -89,6 +130,7 @@ test('case study opens with a four-part outcome summary', async ({ page }) => {
 
 test('booking explainer tabs follow arrow, Home and End keys', async ({ page }) => {
   await page.goto('/projects/car-rental');
+  await settle(page);
   const tabs = page.getByRole('tablist', { name: 'Scenarios' }).getByRole('tab');
   const count = await tabs.count();
   expect(count).toBeGreaterThan(1);
@@ -111,6 +153,7 @@ test('booking explainer tabs follow arrow, Home and End keys', async ({ page }) 
 test('copy email button has a clear name and announces success', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/');
+  await settle(page);
   const button = page.getByRole('button', { name: /^Copy email address / });
   await button.scrollIntoViewIfNeeded();
   await button.click();
@@ -119,5 +162,24 @@ test('copy email button has a clear name and announces success', async ({ page, 
 
 test('unknown pages show the not-found page and are marked noindex', async ({ page }) => {
   await page.goto('/this-page-does-not-exist');
+  await settle(page);
+  await expect(page.locator('main h1')).toHaveText('This page does not exist.');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+});
+
+test('project screenshots load at their declared size', async ({ page }) => {
+  for (const route of routes.filter((r) => r.startsWith('/projects/'))) {
+    await page.goto(route);
+    const images = page.locator('#screens img');
+    for (let i = 0; i < (await images.count()); i++) {
+      const img = images.nth(i);
+      await img.scrollIntoViewIfNeeded();
+      await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
+      const size = await img.evaluate((el: HTMLImageElement) => ({
+        natural: [el.naturalWidth, el.naturalHeight],
+        declared: [Number(el.getAttribute('width')), Number(el.getAttribute('height'))],
+      }));
+      expect(size.natural, `${route} image ${i}`).toEqual(size.declared);
+    }
+  }
 });

@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { getArticle, getArticles, getProject, getProjects } from '@/content/queries';
 import type { Section } from '@/content/types';
@@ -59,6 +60,7 @@ describe('content integrity', () => {
       expect(f.alt.length, f.src).toBeGreaterThan(10);
       expect(f.caption.length, f.src).toBeGreaterThan(0);
       expect(f.width > 0 && f.height > 0, f.src).toBe(true);
+      expect(existsSync(`public${f.src}`), `${f.src} is missing from public/`).toBe(true);
     }
   });
 });

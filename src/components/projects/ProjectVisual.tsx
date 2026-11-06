@@ -97,9 +97,9 @@ function TokenRotation({ marker }: { marker: string }) {
         </g>
       ))}
       <text x={248} y={40} textAnchor="middle" className="fill-faint font-mono text-[9px]">each token works once</text>
-      <Edge marker={marker} d="M153 84 V144 H226" dashed />
+      <Edge marker={marker} d="M153 84 V144 H222" dashed />
       <text x={160} y={120} className="fill-faint font-mono text-[9px]">replayed later</text>
-      <Node x={230} y={127} w={150} label="revoke every session" tone="danger" />
+      <Node x={226} y={127} w={164} label="revoke refresh sessions" tone="danger" />
     </>
   );
 }
