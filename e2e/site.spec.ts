@@ -188,6 +188,7 @@ test('card titles sit one level below their section heading', async ({ page }) =
   ];
   for (const { path, link, level } of cases) {
     await page.goto(path);
+    await settle(page);
     const other = level === 'h2' ? 'h3' : 'h2';
     expect(await page.locator(`main ${level} > ${link}`).count(), `${path} ${link} in ${level}`).toBeGreaterThan(0);
     await expect(page.locator(`main ${other} > ${link}`)).toHaveCount(0);
