@@ -3,7 +3,8 @@ import { Link } from '@/lib/router';
 import type { Article } from '@/content/types';
 import { formatDate } from '@/content/queries';
 
-export function ArticleRow({ article }: { article: Article }) {
+export function ArticleRow({ article, headingLevel = 3 }: { article: Article; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? 'h2' : 'h3';
   return (
     <article className="group relative grid gap-3 rounded-card p-6 transition-colors duration-300 hover:bg-surface sm:grid-cols-[10rem_1fr] sm:gap-8 sm:p-8">
       <div className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-1">
@@ -13,11 +14,11 @@ export function ArticleRow({ article }: { article: Article }) {
         <span className="label">{article.readingMinutes} min read</span>
       </div>
       <div className="space-y-3">
-        <h3 className="text-xl font-semibold transition-colors group-hover:text-accent">
+        <Heading className="text-xl font-semibold transition-colors group-hover:text-accent">
           <Link to={`/writing/${article.slug}`} className="after:absolute after:inset-0 focus-visible:ring-0">
             {article.title}
           </Link>
-        </h3>
+        </Heading>
         <p className="leading-[1.65] text-muted">{article.summary}</p>
         <span className="inline-flex items-center gap-2 text-sm font-medium text-accent">
           Read note

@@ -4,7 +4,8 @@ import type { Project } from '@/content/types';
 import { kindLabel } from '@/content/queries';
 import { ProjectVisual } from '@/components/projects/ProjectVisual';
 
-export function ProjectCard({ project }: { project: Project }) {
+export function ProjectCard({ project, headingLevel = 3 }: { project: Project; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? 'h2' : 'h3';
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-card border border-line bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.03)] transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-[0_18px_40px_-20px_rgb(var(--accent)/0.35)]">
       <ProjectVisual
@@ -17,11 +18,11 @@ export function ProjectCard({ project }: { project: Project }) {
           <span className="text-faint">·</span>
           <span className="label">{kindLabel[project.kind]}</span>
         </div>
-        <h3 className="text-2xl font-semibold">
+        <Heading className="text-2xl font-semibold">
           <Link to={`/projects/${project.slug}`} className="after:absolute after:inset-0 focus-visible:ring-0">
             {project.title}
           </Link>
-        </h3>
+        </Heading>
         <p className="leading-[1.65] text-muted">{project.summary}</p>
         <p className="border-l-2 border-accent/40 pl-4 text-[0.95rem] italic leading-[1.6] text-ink/80">{project.hardProblem}</p>
         <div className="mt-auto flex items-center justify-between pt-4">

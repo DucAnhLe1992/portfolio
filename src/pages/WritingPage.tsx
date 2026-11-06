@@ -12,7 +12,7 @@ export function WritingPage() {
       </PageIntro>
       <div className="-mx-6 divide-y divide-line border-y border-line sm:mx-0">
         {articles.map((a) => (
-          <ArticleRow key={a.slug} article={a} />
+          <ArticleRow key={a.slug} article={a} headingLevel={2} />
         ))}
       </div>
     </>

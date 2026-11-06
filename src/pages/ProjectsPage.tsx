@@ -16,7 +16,7 @@ export function ProjectsPage() {
       <div className="grid gap-6 md:grid-cols-2">
         {projects.map((p, i) => (
           <div key={p.slug} className="animate-rise" style={{ animationDelay: `${i * 80}ms` }}>
-            <ProjectCard project={p} />
+            <ProjectCard project={p} headingLevel={2} />
           </div>
         ))}
       </div>

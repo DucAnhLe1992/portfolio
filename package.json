@@ -12,6 +12,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "test:e2e": "playwright test"
   },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.5"
+    }
+  },
   "dependencies": {
     "lucide-react": "^0.446.0",
     "react": "^18.3.1",
