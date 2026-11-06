@@ -34,9 +34,21 @@ async function jumpTo(page: Page, top: number) {
 }
 
 test('every prerendered page is covered', () => {
-  expect(routes.length).toBeGreaterThanOrEqual(11);
-  expect(routes.filter((r) => r.startsWith('/writing/'))).toHaveLength(2);
-  expect(routes).toEqual(expect.arrayContaining(['/', '/projects/friendster']));
+  expect(routes).toEqual(
+    expect.arrayContaining([
+      '/',
+      '/projects',
+      '/projects/car-rental',
+      '/projects/code-notebook',
+      '/projects/friendster',
+      '/projects/ticket-booking',
+      '/writing',
+      '/writing/checkout-redirect-is-not-confirmation',
+      '/writing/preventing-overlapping-reservations',
+      '/about',
+      '/privacy',
+    ]),
+  );
 });
 
 test.describe('narrow viewport', () => {
