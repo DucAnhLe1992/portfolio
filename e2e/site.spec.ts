@@ -179,6 +179,27 @@ test('unknown pages show the not-found page and are marked noindex', async ({ pa
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
 });
 
+test('card titles sit one level below their section heading', async ({ page }) => {
+  const cases = [
+    { path: '/', link: 'a[href^="/projects/"]', level: 'h3' },
+    { path: '/', link: 'a[href^="/writing/"]', level: 'h3' },
+    { path: '/projects', link: 'a[href^="/projects/"]', level: 'h2' },
+    { path: '/writing', link: 'a[href^="/writing/"]', level: 'h2' },
+  ];
+  for (const { path, link, level } of cases) {
+    await page.goto(path);
+    const other = level === 'h2' ? 'h3' : 'h2';
+    expect(await page.locator(`main ${level} > ${link}`).count(), `${path} ${link} in ${level}`).toBeGreaterThan(0);
+    await expect(page.locator(`main ${other} > ${link}`)).toHaveCount(0);
+
+    const levels = await page.locator('main :is(h1, h2, h3, h4, h5, h6)').evaluateAll((els) => els.map((el) => Number(el.tagName[1])));
+    expect(levels[0], `${path} starts with h1`).toBe(1);
+    levels.forEach((n, i) => {
+      if (i > 0) expect(n, `${path} heading ${i} skips a level`).toBeLessThanOrEqual(levels[i - 1] + 1);
+    });
+  }
+});
+
 test('project screenshots load at their declared size', async ({ page }) => {
   for (const route of routes.filter((r) => r.startsWith('/projects/'))) {
     await page.goto(route);

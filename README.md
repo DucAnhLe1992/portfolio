@@ -13,7 +13,7 @@ Personal site with case studies and engineering notes. Built with Vite, React 18
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript for the app and for the config/e2e files, no emit |
 
-The browser suite covers: no horizontal overflow at 320px on every page, prerendered HTML with JavaScript disabled (with and without a trailing slash), `.html` and `/index.html` aliases keeping their content after hydration, metadata and focus after client navigation, back/forward scroll restoration immediately after scrolling, table-of-contents jumps, the outcome summary, scenario-tab keyboard behaviour, copy-email feedback, and `noindex` on unknown pages. `@playwright/test` is pinned to 1.58 to match the locally installed Chromium; CI installs its own browser.
+The browser suite covers: no horizontal overflow at 320px on every page, prerendered HTML with JavaScript disabled (with and without a trailing slash), `.html` and `/index.html` aliases keeping their content after hydration, metadata and focus after client navigation, back/forward scroll restoration immediately after scrolling, table-of-contents jumps, the outcome summary, scenario-tab keyboard behaviour, copy-email feedback, `noindex` on unknown pages, and heading order (card titles are H2 on the Projects and Writing indexes, H3 under homepage sections, with no skipped levels). `@playwright/test` is pinned to 1.58 to match the locally installed Chromium; CI installs its own browser.
 
 ## Structure
 
@@ -40,6 +40,10 @@ The browser suite covers: no horizontal overflow at 320px on every page, prerend
 The build prepends `301!` rules to `dist/_redirects` sending `/route.html` and `/route/index.html` to `/route`, followed by the catch-all that serves `404.html` with a 404 status. The `!` (force) suffix is Netlify syntax, needed because the files exist on disk. Cloudflare Pages redirects `.html` to clean URLs by itself and does not accept `!`; elsewhere, configure the equivalent. As a fallback the app rewrites the address bar to the clean URL on load and renders the right page.
 
 After deploying, check with JavaScript disabled that known routes return their own HTML, unknown routes return HTTP 404, aliases redirect, and canonical, sitemap and social-image URLs use the real domain.
+
+## Dependency notes
+
+- `overrides` pins `minimatch` to `^11.0.5` under `@typescript-eslint/typescript-estree` only, for [GHSA-g3hv-75wg-m249](https://github.com/isaacs/minimatch/security/advisories/GHSA-g3hv-75wg-m249) (pattern-amplification denial of service, patched in 11.0.1). The parser declares `minimatch@^10`, which has no patched release; it only calls the named `minimatch()` export, which 11.x keeps. Development tooling only; nothing ships to the browser. Remove the override once `typescript-eslint` depends on a patched `minimatch`, then confirm `npm audit` stays clean. Do not widen it to a global override, since ESLint itself still uses `minimatch@3`.
 
 ## Decision record
 
