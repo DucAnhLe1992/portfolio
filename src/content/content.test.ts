@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { getArticle, getArticles, getProject, getProjects } from '@/content/queries';
 import type { Section } from '@/content/types';
+import { profile } from '@/data/profile';
 
 const PINNED = /^https:\/\/github\.com\/DucAnhLe1992\/[\w.-]+\/(blob|tree)\/[0-9a-f]{40}\//;
 
@@ -62,5 +63,11 @@ describe('content integrity', () => {
       expect(f.width > 0 && f.height > 0, f.src).toBe(true);
       expect(existsSync(`public${f.src}`), `${f.src} is missing from public/`).toBe(true);
     }
+  });
+
+  it('links the CV to a PDF that ships with the site', () => {
+    if (!profile.cvUrl) return;
+    expect(profile.cvUrl).toMatch(/^\/[\w.-]+\.pdf$/);
+    expect(existsSync(`public${profile.cvUrl}`), `${profile.cvUrl} is missing from public/`).toBe(true);
   });
 });
